@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "163532904964",
+    "project_id": "clear-backup-437402-a5",
+    "storage_bucket": "clear-backup-437402-a5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:163532904964:android:c7cd1c58f0c88418b4b351",
+        "android_client_info": {
+          "package_name": "com.lenslinkapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "163532904964-ssbmaoo71chosgfiq0n3tmsdolr55h6u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lenslinkapp",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "163532904964-qjfuvvo152h8kkpqkh1l4emrfi9l33pc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDregLhOesorhnigmw7Ps1bm9LiQIkL5Ww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "163532904964-qjfuvvo152h8kkpqkh1l4emrfi9l33pc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

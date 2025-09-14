@@ -110,7 +110,7 @@ const SocialLogin = async (req, res) => {
                 id: user._id,
                 displayName: user.displayName,
                 email: user.email,
-                profilePicture: user.profilePicture
+                photoURL: user.photoURL
             }
         });
     } catch (error) {

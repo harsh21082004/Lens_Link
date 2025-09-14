@@ -95,7 +95,7 @@ export const loginWithGoogle = createAsyncThunk(
       };
 
       // Step 2: Send the Firebase user info to your backend to find or create a profile.
-      const response = await axios.post(`http://10.171.133.69:5000/api/auth/social-login`, userDataForBackend);
+      const response = await axios.post(`https://lens-link-tau.vercel.app/api/auth/social-login`, userDataForBackend);
 
       console.log("Backend response:", response)
 

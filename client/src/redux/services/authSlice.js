@@ -1,14 +1,13 @@
-// src/redux/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
   createUserWithEmailAndPassword,
-  signInWithPopup,
   signInWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
   signInWithCredential,
+  updateProfile,
 } from 'firebase/auth';
-import { auth, googleProvider } from '../../config/firebaseConfig';
+import { auth } from '../../config/firebaseConfig';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { saveUserToStorage, getUserFromStorage, removeUserFromStorage } from '../../utils/authStorage';
 
@@ -18,17 +17,17 @@ const initialState = {
   loading: false,
   error: null,
   isLoggedIn: false,
+  status: 'idle', // idle | loading | succeeded | failed
 }
 
 export const signUp = createAsyncThunk(
   'auth/signUp',
-  async ({ email, password, firstName, lastName }, thunkAPI) => {
+  async ({ email, password, firstName, lastName }, { rejectWithValue }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Update displayName in Firebase
-      await user.updateProfile({
+      await updateProfile(user, {
         displayName: `${firstName} ${lastName}`,
       });
 
@@ -36,15 +35,13 @@ export const signUp = createAsyncThunk(
         uid: user.uid,
         email: user.email,
         displayName: `${firstName} ${lastName}`,
-        firstName,
-        lastName,
         photoURL: user.photoURL || '',
       };
 
       await saveUserToStorage(userData);
       return userData;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -52,7 +49,7 @@ export const signUp = createAsyncThunk(
 
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ email, password }, thunkAPI) => {
+  async ({ email, password }, { rejectWithValue }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -65,19 +62,18 @@ export const login = createAsyncThunk(
       await saveUserToStorage(userData);
       return userData;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return rejectWithValue(error.message);
     }
   }
 );
 
 export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
-  async (_, thunkAPI) => {
+  async (_, { rejectWithValue }) => {
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
+      const { idToken } = await GoogleSignin.signIn();
 
-      const idToken = userInfo.data.idToken;
       if (!idToken) throw new Error('No ID token returned from Google Sign-In');
 
       const googleCredential = GoogleAuthProvider.credential(idToken);
@@ -93,68 +89,85 @@ export const loginWithGoogle = createAsyncThunk(
       await saveUserToStorage(userData);
       return userData;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return rejectWithValue(error.message);
     }
   }
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
   await signOut(auth);
+  await GoogleSignin.revokeAccess();
   await GoogleSignin.signOut();
   await removeUserFromStorage();
 });
 
 export const checkLoginStatus = createAsyncThunk(
   'auth/checkLoginStatus',
-  async (_, thunkAPI) => {
+  async (_, { rejectWithValue }) => {
     try {
       const user = await getUserFromStorage();
       return user;
     } catch (error) {
-      return null;
+      return rejectWithValue(error.message);
     }
   }
 );
 
-
-
 const authSlice = createSlice({
   name: 'auth',
   initialState: initialState,
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(signUp.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(signUp.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.loading = false;
-        state.isLoggedIn = true;
-      })
-      .addCase(signUp.rejected, (state, action) => {
-        state.error = action.payload;
-        state.loading = false;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.loading = false;
-        state.isLoggedIn = true;
-      })
-      .addCase(loginWithGoogle.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.loading = false;
-        state.isLoggedIn = true;
-      })
+      // Specific handlers first
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
         state.isLoggedIn = false;
+        state.loading = false;
+        state.status = 'idle';
+      })
+      .addCase(checkLoginStatus.pending, (state) => {
+        state.status = 'loading';
       })
       .addCase(checkLoginStatus.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isLoggedIn = !!action.payload;
+        state.status = 'succeeded';
       })
-
-},
+      // Generic matchers last
+      .addMatcher(
+        (action) => action.type.endsWith('/pending'),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith('/rejected'),
+        (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+          if (action.type.startsWith('auth/checkLoginStatus')) {
+            state.status = 'failed';
+          }
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith('/fulfilled') && (action.type.startsWith('auth/login') || action.type.startsWith('auth/signUp')),
+        (state, action) => {
+          state.user = action.payload;
+          state.isLoggedIn = true;
+          state.loading = false;
+          state.status = 'succeeded';
+        }
+      );
+  },
 });
 
+export const { clearError } = authSlice.actions;
 export default authSlice.reducer;
+

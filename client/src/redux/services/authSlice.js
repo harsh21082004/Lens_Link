@@ -73,8 +73,13 @@ export const loginWithGoogle = createAsyncThunk(
     try {
       console.log("Google Sign In initiated");
       await GoogleSignin.hasPlayServices();
-      const { idToken } = await GoogleSignin.signIn();
-      console.log(idToken)
+      // Get the full user info object for better debugging
+      const userInfo = await GoogleSignin.signIn();
+      console.log("Google User Info:", userInfo); 
+      
+      const idToken = userInfo.data.idToken;
+
+
       if (!idToken) throw new Error('No ID token returned from Google Sign-In');
 
       const googleCredential = GoogleAuthProvider.credential(idToken);

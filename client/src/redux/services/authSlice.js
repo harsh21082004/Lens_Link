@@ -71,10 +71,10 @@ export const loginWithGoogle = createAsyncThunk(
   'auth/loginWithGoogle',
   async (_, { rejectWithValue }) => {
     try {
+      console.log("Google Sign In initiated");
       await GoogleSignin.hasPlayServices();
       const { idToken } = await GoogleSignin.signIn();
       console.log(idToken)
-
       if (!idToken) throw new Error('No ID token returned from Google Sign-In');
 
       const googleCredential = GoogleAuthProvider.credential(idToken);
@@ -90,6 +90,7 @@ export const loginWithGoogle = createAsyncThunk(
       await saveUserToStorage(userData);
       return userData;
     } catch (error) {
+      console.log("Google Sign In error:", error)
       return rejectWithValue(error.message);
     }
   }
@@ -97,8 +98,15 @@ export const loginWithGoogle = createAsyncThunk(
 
 export const logout = createAsyncThunk('auth/logout', async () => {
   await signOut(auth);
-  await GoogleSignin.revokeAccess();
-  await GoogleSignin.signOut();
+  try {
+    const isSignedIn = await GoogleSignin.isSignedIn();
+    if (isSignedIn) {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+    }
+  } catch (error) {
+    console.error("Error during Google Sign Out (this is expected for non-Google users):", error);
+  }
   await removeUserFromStorage();
 });
 
@@ -106,6 +114,7 @@ export const checkLoginStatus = createAsyncThunk(
   'auth/checkLoginStatus',
   async (_, { rejectWithValue }) => {
     try {
+      console.log("Checking login status...")
       const user = await getUserFromStorage();
       return user;
     } catch (error) {
@@ -120,6 +129,9 @@ const authSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    setIsLoggedIn: (state, action) => {
+      state.isLoggedIn = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -157,8 +169,13 @@ const authSlice = createSlice({
           }
         }
       )
+      // FIX: Added 'loginWithGoogle' to this matcher to handle successful social logins.
       .addMatcher(
-        (action) => action.type.endsWith('/fulfilled') && (action.type.startsWith('auth/login') || action.type.startsWith('auth/signUp')),
+        (action) => action.type.endsWith('/fulfilled') && (
+          action.type.startsWith('auth/login') ||
+          action.type.startsWith('auth/signUp') ||
+          action.type.startsWith('auth/loginWithGoogle')
+        ),
         (state, action) => {
           state.user = action.payload;
           state.isLoggedIn = true;
@@ -169,6 +186,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, setIsLoggedIn } = authSlice.actions;
 export default authSlice.reducer;
 

@@ -13,6 +13,7 @@ export const saveUserToStorage = async (user) => {
 export const getUserFromStorage = async () => {
   try {
     const user = await AsyncStorage.getItem(USER_KEY);
+    console.log(user);
     return user ? JSON.parse(user) : null;
   } catch (e) {
     console.log('❌ Error reading user from storage', e);
@@ -22,6 +23,7 @@ export const getUserFromStorage = async () => {
 
 export const removeUserFromStorage = async () => {
   try {
+    console.log("user");
     await AsyncStorage.removeItem(USER_KEY);
   } catch (e) {
     console.log('❌ Error removing user from storage', e);

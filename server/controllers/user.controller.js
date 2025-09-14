@@ -54,4 +54,58 @@ const Login = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
-module.exports = { SignUp, Login };
+
+const SocialLogin = async (req, res) => {
+    try {
+        const { idToken } = req.body;
+
+        // 1. Verify the Firebase ID token
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const { email, name, picture } = decodedToken;
+
+        // 2. Check if the user already exists in your MongoDB
+        let user = await User.findOne({ email });
+
+        // 3. If user doesn't exist, create a new one
+        if (!user) {
+            // We use a random password because this user will only log in via social media
+            const randomPassword = Math.random().toString(36).slice(-8);
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+            // Create a username from the email
+            const username = email.split('@')[0];
+
+            user = new User({
+                displayName: name,
+                username: username,
+                email,
+                password: hashedPassword, // User will not use this password
+                profilePicture: picture || '',
+            });
+            await user.save();
+        }
+
+        // 4. Create your backend's own JWT for the user
+        const token = jwt.sign({ id: user._id },
+            process.env.JWT_SECRET, { expiresIn: '7d' }); // Longer expiry for social logins
+
+        // 5. Send the token and user data back to the app
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: user._id,
+                displayName: user.displayName,
+                email: user.email,
+                profilePicture: user.profilePicture
+            }
+        });
+
+    } catch (error) {
+        console.error('Error during social login:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+module.exports = { SignUp, Login, SocialLogin };

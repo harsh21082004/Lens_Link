@@ -23,6 +23,7 @@ const LoginScreen = () => {
     const { loading, error } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    console.log(loading);
 
     const handleLogin = () => {
         if (email && password) {

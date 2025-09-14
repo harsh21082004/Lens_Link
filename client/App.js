@@ -2,31 +2,32 @@ import React, { useEffect } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { store } from './src/redux/store';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import AppNavigator from './src/navigation/AppNavigator';
+import { ActivityIndicator, View } from 'react-native';
 import { checkLoginStatus } from './src/redux/services/authSlice';
-import { store } from './src/redux/store';
 
-// A simple splash/loading screen
-const SplashScreen = () => (
-  <View style={styles.splashContainer}>
-    <ActivityIndicator size="large" color="#FFA500" />
-  </View>
-);
+// This is the most important line: It imports and runs your Google Sign-In configuration
+// as soon as the app launches, preventing the "apiClient is null" error.
+import './src/utils/GoogleSignIn';
+
 
 const Main = () => {
   const { isLoggedIn, status } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Check login status only once when the app loads
     dispatch(checkLoginStatus());
   }, [dispatch]);
 
-  // Show a splash screen while checking auth status
-  if (status === 'idle' || status === 'loading') {
-    return <SplashScreen />;
+  // Display a loading indicator while checking the user's login state.
+  if (status === 'loading' || status === 'idle') {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#141311' }}>
+        <ActivityIndicator size="large" color="#FFA500" />
+      </View>
+    );
   }
 
   return (
@@ -46,13 +47,5 @@ const App = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  splashContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#141311',
-  }
-});
-
 export default App;
+

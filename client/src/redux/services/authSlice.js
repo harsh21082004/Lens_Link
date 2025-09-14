@@ -73,6 +73,7 @@ export const loginWithGoogle = createAsyncThunk(
     try {
       await GoogleSignin.hasPlayServices();
       const { idToken } = await GoogleSignin.signIn();
+      console.log(idToken)
 
       if (!idToken) throw new Error('No ID token returned from Google Sign-In');
 

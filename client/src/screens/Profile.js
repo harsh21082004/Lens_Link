@@ -1,116 +1,116 @@
 import React from 'react';
 import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-  StatusBar,
+    StyleSheet,
+    Text,
+    View,
+    SafeAreaView,
+    Image,
+    TouchableOpacity,
+    ScrollView,
+    FlatList,
+    StatusBar,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 
 // Placeholder data for the photo grid - replace with user's actual posts
 const userPosts = [
-  { id: '1', uri: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0' },
-  { id: '2', uri: 'https://images.unsplash.com/photo-1542038784-56eD6b4b5758' },
-  { id: '3', uri: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e' },
-  { id: '4', uri: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1' },
-  { id: '5', uri: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9' },
-  { id: '6', uri: 'https://images.unsplash.com/photo-1511884642898-4c92249e20b6' },
-  { id: '7', uri: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d' },
-  { id: '8', uri: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
-  { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '1', uri: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0' },
+    { id: '2', uri: 'https://images.unsplash.com/photo-1542038784-56eD6b4b5758' },
+    { id: '3', uri: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e' },
+    { id: '4', uri: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1' },
+    { id: '5', uri: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9' },
+    { id: '6', uri: 'https://images.unsplash.com/photo-1511884642898-4c92249e20b6' },
+    { id: '7', uri: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d' },
+    { id: '8', uri: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
+    { id: '9', uri: 'https://images.unsplash.com/photo-1505144808419-1957a94ca61e' },
 ];
 
 const ProfileScreen = () => {
-  // Get user data from Redux store
-  const { user } = useSelector((state) => state.auth);
+    // Get user data from Redux store
+    const { user } = useSelector((state) => state.auth);
 
-  const renderPost = ({ item }) => (
-    <TouchableOpacity style={styles.post}>
-      <Image source={{ uri: item.uri }} style={styles.postImage} />
-    </TouchableOpacity>
-  );
+    const renderPost = ({ item }) => (
+        <TouchableOpacity style={styles.post}>
+            <Image source={{ uri: item.uri }} style={styles.postImage} />
+        </TouchableOpacity>
+    );
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-            <Text style={styles.username}>{user?.displayName || 'Username'}</Text>
-            {/* Add settings icon/button here */}
-            <TouchableOpacity>
-                <Text style={{color: '#fff'}}>⚙️</Text>
-            </TouchableOpacity>
-        </View>
-
-        {/* Profile Info */}
-        <View style={styles.profileInfoContainer}>
-            <Image
-                source={{ uri: user?.photoURL || 'https://placehold.co/100x100/141311/orange?text=AU' }}
-                style={styles.avatar}
-            />
-            <View style={styles.statsContainer}>
-                <View style={styles.stat}>
-                    <Text style={styles.statCount}>120</Text>
-                    <Text style={styles.statLabel}>Posts</Text>
+    return (
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="light-content" />
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Text style={styles.username}>{user?.displayName || 'Username'}</Text>
+                    {/* Add settings icon/button here */}
+                    <TouchableOpacity>
+                        <Text style={{ color: '#fff' }}>⚙️</Text>
+                    </TouchableOpacity>
                 </View>
-                <View style={styles.stat}>
-                    <Text style={styles.statCount}>1.2M</Text>
-                    <Text style={styles.statLabel}>Followers</Text>
+
+                {/* Profile Info */}
+                <View style={styles.profileInfoContainer}>
+                    <Image
+                        source={{ uri: user?.photoURL || 'https://placehold.co/100x100/141311/orange?text=AU' }}
+                        style={styles.avatar}
+                    />
+                    <View style={styles.statsContainer}>
+                        <View style={styles.stat}>
+                            <Text style={styles.statCount}>120</Text>
+                            <Text style={styles.statLabel}>Posts</Text>
+                        </View>
+                        <View style={styles.stat}>
+                            <Text style={styles.statCount}>1.2M</Text>
+                            <Text style={styles.statLabel}>Followers</Text>
+                        </View>
+                        <View style={styles.stat}>
+                            <Text style={styles.statCount}>345</Text>
+                            <Text style={styles.statLabel}>Following</Text>
+                        </View>
+                    </View>
                 </View>
-                <View style={styles.stat}>
-                    <Text style={styles.statCount}>345</Text>
-                    <Text style={styles.statLabel}>Following</Text>
+
+                {/* Bio Section */}
+                <View style={styles.bioContainer}>
+                    <Text style={styles.name}>{user?.displayName || 'User Name'}</Text>
+                    <Text style={styles.bio}>
+                        Capturing the world one frame at a time. 📸✨ {'\n'}DM for collaborations.
+                    </Text>
+                    <TouchableOpacity>
+                        <Text style={styles.link}>www.yourportfolio.com</Text>
+                    </TouchableOpacity>
                 </View>
-            </View>
-        </View>
 
-        {/* Bio Section */}
-        <View style={styles.bioContainer}>
-            <Text style={styles.name}>{user?.displayName || 'User Name'}</Text>
-            <Text style={styles.bio}>
-                Capturing the world one frame at a time. 📸✨ {'\n'}DM for collaborations.
-            </Text>
-            <TouchableOpacity>
-                <Text style={styles.link}>www.yourportfolio.com</Text>
-            </TouchableOpacity>
-        </View>
+                {/* Action Buttons */}
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button}>
+                        <Text style={styles.buttonText}>Edit Profile</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.button}>
+                        <Text style={styles.buttonText}>Share Profile</Text>
+                    </TouchableOpacity>
+                </View>
 
-        {/* Action Buttons */}
-        <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Edit Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Share Profile</Text>
-            </TouchableOpacity>
-        </View>
+                {/* Photo Grid */}
+                <FlatList
+                    data={userPosts}
+                    renderItem={renderPost}
+                    keyExtractor={(item) => item.id}
+                    numColumns={3}
+                    scrollEnabled={false} // Disable FlatList scrolling since it's inside a ScrollView
+                    columnWrapperStyle={{ justifyContent: 'space-between' }}
+                />
 
-        {/* Photo Grid */}
-        <FlatList
-          data={userPosts}
-          renderItem={renderPost}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          scrollEnabled={false} // Disable FlatList scrolling since it's inside a ScrollView
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
-        />
-
-      </ScrollView>
-    </SafeAreaView>
-  );
+            </ScrollView>
+        </SafeAreaView>
+    );
 };
 
 const styles = StyleSheet.create({

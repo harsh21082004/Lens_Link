@@ -11,9 +11,11 @@ import { auth } from '../../config/firebaseConfig';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { saveUserToStorage, getUserFromStorage, removeUserFromStorage } from '../../utils/authStorage';
 import axios from 'axios';
+import { BACKEND_BASE_URL } from '@env';
+const API_URL = `${BACKEND_BASE_URL}`;
 
-// IMPORTANT: For Android, use your machine's local network IP, not localhost.
-const API_URL = "http://localhost:5000/api"; // Replace with your actual IP
+
+console.log("Backend URL:", API_URL);
 
 const initialState = {
   user: null,
@@ -29,17 +31,20 @@ export const signUp = createAsyncThunk(
   async ({ email, password, firstName, lastName }, { rejectWithValue }) => {
     try {
       // Step 1: Create the user in Firebase Auth for authentication services.
-      await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("Firebase user created:", firebaseUser.user)
       
       // Step 2: Call your backend to create the user profile in MongoDB.
       const response = await axios.post(`${API_URL}/auth/signup`, {
-        name: `${firstName} ${lastName}`,
+        uid: firebaseUser.user.uid,
+        displayName: `${firstName} ${lastName}`,
         email,
         password,
       });
 
-      // The backend responds with the new user object from Mongo and a JWT.
       const { user, token } = response.data;
+
+      console.log(user, token, response)
       
       // Step 3: Save the backend's response (your user profile and JWT) to local storage.
       await saveUserToStorage({ user, token });
@@ -94,8 +99,10 @@ export const loginWithGoogle = createAsyncThunk(
         photoURL: firebaseUser.photoURL,
       };
 
+      console.log("Backend URL:", API_URL);
+
       // Step 2: Send the Firebase user info to your backend to find or create a profile.
-      const response = await axios.post(`https://lens-link-tau.vercel.app/api/auth/social-login`, userDataForBackend);
+      const response = await axios.post(`${API_URL}/auth/social-login`, userDataForBackend);
 
       console.log("Backend response:", response)
 
@@ -128,6 +135,7 @@ export const checkLoginStatus = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // Retrieves { user, token } from storage.
+      console.log("Checking login status from storage");
       const data = await getUserFromStorage();
       return data;
     } catch (error) {
@@ -151,7 +159,9 @@ const authSlice = createSlice({
         state.token = null;
         state.isLoggedIn = false;
         state.loading = false;
-        state.status = 'idle';
+        // FIX: The status should be 'succeeded' after a successful logout, not 'idle'.
+        // This prevents the app from getting stuck on an initial loading screen.
+        state.status = 'succeeded';
       })
       .addCase(checkLoginStatus.fulfilled, (state, action) => {
         state.user = action.payload?.user || null;

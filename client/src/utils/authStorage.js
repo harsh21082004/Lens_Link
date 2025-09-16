@@ -25,6 +25,7 @@ export const removeUserFromStorage = async () => {
   try {
     console.log("user");
     await AsyncStorage.removeItem(USER_KEY);
+    console.log("User removed from storage");
   } catch (e) {
     console.log('❌ Error removing user from storage', e);
   }

@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 
 const SignUp = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { displayName, email, password, uid } = req.body;
 
         const user = await User.findOne({ email });
 
@@ -17,29 +17,31 @@ const SignUp = async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        
+
         // Create a simple unique username
         const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
 
         const newUser = new User({
-            displayName: name, // Ensure this matches your User schema field
+            uid: uid,
+            displayName: displayName, // Ensure this matches your User schema field
             username,
             email,
             password: hashedPassword
         });
 
         await newUser.save();
-        
-        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        const token = jwt.sign({ uid: uid }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         res.status(201).json({
             message: 'User created successfully',
             token,
-            user: { 
-                id: newUser._id, 
-                displayName: newUser.displayName, 
+            user: {
+                uid: uid,
+                displayName: newUser.displayName,
                 username: newUser.username,
-                email: newUser.email 
+                email: newUser.email,
+                photoURL: user.photoURL || ''
             }
         });
     } catch (error) {
@@ -59,16 +61,17 @@ const Login = async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
-        const token = jwt.sign({ id: user._id },
+        const token = jwt.sign({ uid: user.uid },
             process.env.JWT_SECRET, { expiresIn: '7d' });
         res.status(200).json({
             message: 'Login successful',
             token,
-            user: { 
-                id: user._id, 
-                displayName: user.displayName, 
-                email: user.email, 
-                profilePicture: user.profilePicture 
+            user: {
+                uid: user.uid,
+                displayName: user.displayName, // Ensure this matches your User schema field
+                username: user.username,
+                email: user.email,
+                photoURL: user.photoURL || ''
             }
         });
     } catch (error) {
@@ -83,6 +86,7 @@ const SocialLogin = async (req, res) => {
         const { uid, email, displayName, photoURL } = req.body;
 
         let user = await User.findOne({ email });
+        console.log("Social login user:", uid);
 
         if (!user) {
             console.log(`User not found for email ${email}. Creating new user.`);
@@ -96,7 +100,7 @@ const SocialLogin = async (req, res) => {
                 email,
                 password: hashedPassword,
                 photoURL: photoURL || '',
-                uid: uid 
+                uid: uid
             });
             await user.save();
         }

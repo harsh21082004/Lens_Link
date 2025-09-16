@@ -9,7 +9,6 @@ import {
   ScrollView,
   FlatList,
   StatusBar,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/Feather';
@@ -61,7 +60,7 @@ const ProfileScreen = () => {
       }}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.username}>{user?.displayName || 'Username'}</Text>
+          <Text numberOfLines={1} style={styles.username}>@{user?.username || 'Username'}</Text>
           <TouchableOpacity>
             <Icon name="menu" size={24} color="#fff" />
           </TouchableOpacity>
@@ -76,7 +75,8 @@ const ProfileScreen = () => {
             />
             <View style={styles.profileRight}>
               <Text style={styles.name}>{user?.displayName || 'User Name'}</Text>
-              <Text style={styles.userId}>{user?.displayName || 'User Name'}</Text>
+              {/* FIX: Removed the invalid syntax from this line. */}
+              <Text style={styles.userId}>@{user?.username || 'user_name'}</Text>
             </View>
           </View>
           <View style={styles.bioContainer}>
@@ -116,20 +116,28 @@ const ProfileScreen = () => {
               <Text style={styles.buttonText}>Log Out</Text>
             </TouchableOpacity>
           </View>
+          {/* FIX: Replaced TouchableWithoutFeedback with TouchableOpacity to apply styles */}
           <View style={styles.category}>
-            <TouchableWithoutFeedback style={styles.categoryIcon} onPress={() => handleCategoryPress('grid')}>
-              <Icon name={"grid"} size={24} color={activeCategory == "grid" ? "#FFA500" : "#fff"} />
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback style={styles.categoryIcon} onPress={() => handleCategoryPress('film')}>
-              <Icon name={"film"} size={24} color={activeCategory == "film" ? "#FFA500" : "#fff"} />
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback style={styles.categoryIcon} onPress={() => handleCategoryPress('perm-contact-cal')}>
-              <Icon1 name={"perm-contact-cal"} size={24} color={activeCategory == "perm-contact-cal" ? "#FFA500" : "#fff"} />
-            </TouchableWithoutFeedback>
+            <TouchableOpacity
+              style={[styles.categoryIcon, activeCategory === 'grid' && styles.activeCategoryIcon]}
+              onPress={() => handleCategoryPress('grid')}
+            >
+              <Icon name={"grid"} size={24} color={activeCategory == "grid" ? "#fff" : "#FFA500"} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.categoryIcon, activeCategory === 'film' && styles.activeCategoryIcon]}
+              onPress={() => handleCategoryPress('film')}
+            >
+              <Icon name={"film"} size={24} color={activeCategory == "film" ? "#fff" : "#FFA500"} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.categoryIcon, activeCategory === 'perm-contact-cal' && styles.activeCategoryIcon]}
+              onPress={() => handleCategoryPress('perm-contact-cal')}
+            >
+              <Icon1 name={"perm-contact-calendar"} size={24} color={activeCategory == "perm-contact-cal" ? "#fff" : "#FFA500"} />
+            </TouchableOpacity>
           </View>
         </View>
-
-        {/* Action Buttons */}
 
         {/* Photo Grid */}
         <FlatList
@@ -163,8 +171,9 @@ const styles = StyleSheet.create({
   },
   username: {
     color: '#fff',
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
+    maxWidth: '50%'
   },
   userId: {
     color: 'gray',
@@ -247,12 +256,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  // FIX: Adjusted styles for the touchable area
   categoryIcon: {
-    padding: 10,
+    padding: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 5,
-    backgroundColor: '#706c7cff',
+    borderRadius: 10,
+    backgroundColor: '#2b2931', // Default background
+  },
+  activeCategoryIcon: {
+    backgroundColor: '#FFA500', // Active background color
   },
   category: {
     flexDirection: 'row',
@@ -272,4 +285,5 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileScreen;
+
 

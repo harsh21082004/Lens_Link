@@ -1,11 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Image, View } from 'react-native';
+import { BlurView } from '@react-native-community/blur';
 
 import HomeScreen from '../screens/HomeScreen';
 import ExploreScreen from '../screens/ExploreScreen';
 import Notifications from '../screens/Notifications';
 import Profile from '../screens/Profile';
+
 
 // Icon assets
 const icons = {
@@ -72,35 +74,48 @@ const renderTabBarIcon = (route, focused, size) => {
 
 const AppNavigator = () => {
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, size }) => renderTabBarIcon(route, focused, size),
-        headerShown: false,
-        tabBarLabelStyle: { display: 'none' },
-        tabBarItemStyle: {
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        },
-        tabBarStyle: {
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          elevation: 0,
-          backgroundColor: '#2b2931',
-          borderTopWidth: 0,
-          borderRadius: 30,
-          height: 80,
-          paddingTop: 15,
-        },
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Notifications" component={Notifications} />
-      <Tab.Screen name="Explore" component={ExploreScreen} />
-      <Tab.Screen name="Profile" component={Profile} />
-    </Tab.Navigator>
+    <>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          // FIX: Removed hardcoded size; React Navigation provides this.
+          tabBarIcon: ({ focused, size }) => renderTabBarIcon(route, focused, size),
+          headerShown: false,
+          tabBarLabelStyle: { display: 'none' },
+          tabBarItemStyle: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 10
+          },
+          tabBarStyle: {
+            position: 'absolute',
+            bottom: 10,
+            elevation: 0,
+            backgroundColor: 'transparent', 
+            borderTopWidth: 0,
+            borderRadius: 35,
+            height: 65,
+            overflow: 'hidden', 
+            marginHorizontal: 10,
+          },
+          tabBarBackground: () => (
+            <View style={styles.blurWrapper}>
+              <BlurView
+                blurType="light"
+                blurAmount={50}
+                style={StyleSheet.absoluteFill}
+                downsampleFactor={10}
+                overlayColor='rgba(2, 69, 65, 0.33)'
+              />
+            </View>)
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Notifications" component={Notifications} />
+        <Tab.Screen name="Explore" component={ExploreScreen} />
+        <Tab.Screen name="Profile" component={Profile} />
+      </Tab.Navigator >
+    </>
   );
 };
 
@@ -111,22 +126,36 @@ const styles = StyleSheet.create({
   activeIconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
   },
   activeIconBackground: {
-    backgroundColor: '#141311ff',
-    padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   activeUnderline: {
-    marginTop: 6,
+    marginTop: 8,
     width: 20,
     height: 3,
     backgroundColor: '#FFA500',
     borderRadius: 2,
   },
+  blurView: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 35,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 10,
+    height: 65,
+    marginHorizontal: 10,
+    // Removed fixed height as it's not needed here
+  },
+  blurWrapper: {
+    flex: 1,
+    overflow: 'hidden',
+    borderRadius: 35,
+    // backgroundColor: 'rgba(255, 255, 255, 0.2)', // Optional: slight tint
+  },
 });
 
 export default AppNavigator;
+

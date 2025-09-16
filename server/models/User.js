@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    // Add a unique username for mentions and profile links
+    uid: {
+        type: String,
+        required: true,
+    },
     username: {
         type: String,
         required: true,

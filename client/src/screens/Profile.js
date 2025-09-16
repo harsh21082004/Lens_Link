@@ -42,12 +42,11 @@ const ProfileScreen = () => {
   const [activeCategory, setActiveCategory] = useState('grid');
 
 
-  const renderPost = ({ item }) => (
-    <TouchableOpacity style={styles.post}>
-      <Image source={{ uri: item.uri }} style={styles.postImage} />
-    </TouchableOpacity>
-  );
-
+    const renderPost = ({ item }) => (
+        <TouchableOpacity style={styles.post}>
+            <Image source={{ uri: item.uri }} style={styles.postImage} />
+        </TouchableOpacity>
+    );
   const handleCategoryPress = (category) => {
     setActiveCategory(category);
   }
@@ -150,9 +149,9 @@ const ProfileScreen = () => {
           contentContainerStyle={{ paddingHorizontal: 5 }}
         />
 
-      </ScrollView>
-    </SafeAreaView>
-  );
+            </ScrollView>
+        </SafeAreaView>
+    );
 };
 
 const styles = StyleSheet.create({

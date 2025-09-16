@@ -65,7 +65,7 @@ const renderTabBarIcon = (route, focused, size) => {
         {
           width: size,
           height: size,
-          tintColor: 'gray',
+          tintColor: 'rgba(255, 255, 255, 0.6)',
         },
       ]}
     />
